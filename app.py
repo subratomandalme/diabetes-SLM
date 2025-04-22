@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, render_template
+.from flask import Flask, request, jsonify, render_template
 import subprocess
 import os
 import threading
@@ -10,7 +10,7 @@ import traceback
 app = Flask(__name__)
 
 
-MODEL_RUNNER_PATH = "B:\\code\\basic-slm-diabetes\\diabetes\\model_runner.py"
+MODEL_RUNNER_PATH = 'model_runner.py'
 
 
 APP_DIR = os.path.dirname(os.path.abspath(__file__))
