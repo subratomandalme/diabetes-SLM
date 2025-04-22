@@ -112,4 +112,4 @@ The core of this application is a Small Language Model (SLM).
 
 ##  Contact
 
-Created by subratomandalme - https://github.com/subratomandalme
+Created by subratomandal - https://github.com/subratomandalme
