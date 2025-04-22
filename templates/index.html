@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diabetes Q&A</title>
+    <style>
+        body {
+            background-color: #0d0d0d;
+            color: #ffffff;
+            font-family: 'Helvetica Neue', sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        h1 {
+            margin-bottom: 20px;
+            font-size: 2em;
+        }
+        .container {
+            background-color: #1a1a1a;
+            padding: 20px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            margin-top: 10px;
+            margin-bottom: 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #2a2a2a;
+            color: #ffffff;
+            font-size: 1em;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 5px;
+            background-color: #00aaff;
+            color: white;
+            font-size: 1em;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0088cc;
+        }
+        .answer {
+            margin-top: 20px;
+            background-color: #2a2a2a;
+            padding: 15px;
+            border-radius: 5px;
+            min-height: 80px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Diabetes Q&A</h1>
+    <div class="container">
+        <input type="text" id="question" placeholder="Ask a question about diabetes...">
+        <button onclick="getAnswer()">Get Answer</button>
+        <div class="answer" id="answer">Your answer will appear here...</div>
+    </div>
+
+    <script>
+        async function getAnswer() {
+            const question = document.getElementById('question').value;
+            const answerDiv = document.getElementById('answer');
+
+            if (question.trim() === '') {
+                answerDiv.textContent = 'Please enter a question.';
+                return;
+            }
+
+            answerDiv.textContent = 'Thinking...';
+
+            // You need to replace this fetch URL with your backend server API
+            try {
+                const response = await fetch('http://localhost:5000/ask', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ question: question })
+                });
+                const data = await response.json();
+                answerDiv.textContent = data.answer;
+            } catch (error) {
+                console.error('Error fetching answer:', error);
+                answerDiv.textContent = 'Error getting answer. Please try again.';
+            }
+        }
+    </script>
+</body>
+</html>
