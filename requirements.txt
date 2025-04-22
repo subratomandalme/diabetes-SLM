@@ -1,5 +1,6 @@
-
 flask
 torch
 transformers
-datasets
+datasets 
+sentencepiece 
+accelerate

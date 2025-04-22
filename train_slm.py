@@ -1,4 +1,4 @@
-# train_slm.py
+
 import torch
 from datasets import load_dataset
 from transformers import (
@@ -11,33 +11,33 @@ from transformers import (
 from pathlib import Path
 import os
 
-# 1) Set working directory
+
 dir_path = Path(__file__).parent.resolve()
 os.chdir(dir_path)
 
-# 2) Device
+
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print(f"Using device: {device}")
 
-# 3) Load dataset
+
 data_file = dir_path / "medical_qa.csv"
 if not data_file.exists():
     raise FileNotFoundError(f"CSV not found: {data_file}")
 dataset = load_dataset("csv", data_files={"train": str(data_file)}, split="train")
 print(f"Loaded {len(dataset)} samples")
 
-# 4) Model & Tokenizer
+
 model_name = "t5-small"
 tokenizer = AutoTokenizer.from_pretrained(model_name, use_fast=True)
 model = T5ForConditionalGeneration.from_pretrained(model_name).to(device)
 
-# 5) Preprocessing (dynamic padding)
+
 def preprocess_function(examples):
     inputs = [f"question: {q}" for q in examples["question"]]
     targets = examples["answer"]
     model_inputs = tokenizer(inputs, truncation=True)
     labels = tokenizer(targets, truncation=True).input_ids
-    # mask pad tokens in labels
+    
     model_inputs["labels"] = [
         [(label if label != tokenizer.pad_token_id else -100) for label in seq]
         for seq in labels
@@ -46,10 +46,10 @@ def preprocess_function(examples):
 
 tokenized = dataset.map(preprocess_function, batched=True, remove_columns=dataset.column_names)
 
-# 6) Data collator for dynamic padding
+
 data_collator = DataCollatorForSeq2Seq(tokenizer, model=model)
 
-# 7) Training arguments
+
 output_dir = dir_path / "basic-slm-medical-model"
 training_args = TrainingArguments(
     output_dir=str(output_dir),
@@ -63,7 +63,7 @@ training_args = TrainingArguments(
     report_to=None
 )
 
-# 8) Trainer and train
+
 trainer = Trainer(
     model=model,
     args=training_args,
@@ -73,13 +73,13 @@ trainer = Trainer(
 )
 trainer.train()
 
-# 9) Save model and tokenizer
+
 model.save_pretrained(str(output_dir))
 tokenizer.save_pretrained(str(output_dir))
 print("Model saved to", output_dir)
 
 
-# run_inference_zero_shot.py
+
 """
 Zero-shot diabetes Q&A using a larger instruction-tuned FLAN-T5 model.
 """
@@ -89,18 +89,18 @@ from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 from pathlib import Path
 import os
 
-# 1) Set working directory to script location
+
 script_dir = Path(__file__).parent.resolve()
 os.chdir(script_dir)
 
-# 2) Load pretrained instruction-tuned FLAN-T5-large
+
 tokenizer = AutoTokenizer.from_pretrained("google/flan-t5-large")
 model = AutoModelForSeq2SeqLM.from_pretrained("google/flan-t5-large")
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 model.to(device)
 
-# 3) Answer function with stronger generation constraints
+
 def answer_question(
     question: str,
     max_len: int = 256,
@@ -132,7 +132,7 @@ def answer_question(
     )
     return tokenizer.decode(outputs[0], skip_special_tokens=True)
 
-# 4) CLI Loop
+
 def main():
     print("FLAN-T5 Diabetes Q&A (zero-shot) with FLAN-T5-large. Type 'exit' to quit.")
     while True:

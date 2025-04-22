@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DiabetesGPT - Your Diabetes Assistant</title>
+    <style>
+        :root {
+            --bg-primary: #121212;
+            --bg-secondary: #1e1e1e;
+            --text-primary: #e0e0e0;
+            --text-secondary: #a0a0a0;
+            --accent: #6f42c1;
+            --accent-light: #8250df;
+            --error: #cf6679;
+            --success: #03dac6;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        header {
+            background-color: var(--bg-secondary);
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+        
+        .logo {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .logo span {
+            color: var(--accent);
+        }
+        
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+        
+        nav {
+            display: flex;
+            justify-content: center;
+            margin-top: 1rem;
+        }
+        
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+        
+        nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 1.1rem;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+        
+        nav a:hover {
+            color: var(--text-primary);
+            background-color: rgba(111, 66, 193, 0.2);
+        }
+        
+        nav a.active {
+            color: var(--accent);
+            background-color: rgba(111, 66, 193, 0.1);
+        }
+        
+        main {
+            flex: 1;
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        
+        .hero {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            padding: 3rem 1rem;
+        }
+        
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+        }
+        
+        .hero h1 span {
+            color: var(--accent);
+        }
+        
+        .hero p {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            max-width: 800px;
+            margin-bottom: 2.5rem;
+            line-height: 1.6;
+        }
+        
+        .cta-buttons {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .cta-btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 4px;
+            font-size: 1rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .primary-btn {
+            background-color: var(--accent);
+            color: white;
+        }
+        
+        .primary-btn:hover {
+            background-color: var(--accent-light);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(111, 66, 193, 0.3);
+        }
+        
+        .secondary-btn {
+            background-color: transparent;
+            color: var(--text-primary);
+            border: 1px solid var(--text-secondary);
+        }
+        
+        .secondary-btn:hover {
+            border-color: var(--text-primary);
+            transform: translateY(-2px);
+        }
+        
+        .features {
+            margin: 4rem 0;
+        }
+        
+        .section-title {
+            text-align: center;
+            font-size: 2rem;
+            margin-bottom: 3rem;
+            position: relative;
+        }
+        
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background-color: var(--accent);
+            border-radius: 2px;
+        }
+        
+        .feature-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+        
+        .card {
+            background-color: var(--bg-secondary);
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+        }
+        
+        .card-icon {
+            width: 60px;
+            height: 60px;
+            background-color: rgba(111, 66, 193, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .card-icon svg {
+            width: 30px;
+            height: 30px;
+            stroke: var(--accent);
+        }
+        
+        .card-title {
+            font-size: 1.25rem;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+        }
+        
+        .card-content {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+        
+        .how-it-works {
+            margin: 6rem 0;
+        }
+        
+        .steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 3rem;
+            margin-top: 3rem;
+        }
+        
+        .step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        
+        .step-number {
+            width: 50px;
+            height: 50px;
+            background-color: var(--accent);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 1.5rem;
+        }
+        
+        .step-title {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+        
+        .step-description {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+        
+        .testimonials {
+            margin: 6rem 0;
+            text-align: center;
+        }
+        
+        .testimonial-cards {
+            display: flex;
+            gap: 2rem;
+            margin-top: 3rem;
+            overflow-x: auto;
+            padding: 1rem;
+            scrollbar-width: thin;
+            scrollbar-color: var(--accent) var(--bg-secondary);
+        }
+        
+        .testimonial-cards::-webkit-scrollbar {
+            height: 8px;
+        }
+        
+        .testimonial-cards::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+            border-radius: 4px;
+        }
+        
+        .testimonial-cards::-webkit-scrollbar-thumb {
+            background-color: var(--accent);
+            border-radius: 4px;
+        }
+        
+        .testimonial-card {
+            background-color: var(--bg-secondary);
+            border-radius: 8px;
+            padding: 2rem;
+            min-width: 300px;
+            flex: 0 0 auto;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+        
+        .quote {
+            font-size: 1.1rem;
+            line-height: 1.7;
+            margin-bottom: 1.5rem;
+            font-style: italic;
+            color: var(--text-primary);
+        }
+        
+        .quote::before {
+            content: '"';
+            font-size: 4rem;
+            position: absolute;
+            top: -15px;
+            left: 10px;
+            color: rgba(111, 66, 193, 0.2);
+            font-family: Georgia, serif;
+        }
+        
+        .author {
+            font-size: 1rem;
+            color: var(--accent);
+            font-weight: 600;
+        }
+        
+        .cta-section {
+            background-color: var(--bg-secondary);
+            padding: 4rem 2rem;
+            text-align: center;
+            border-radius: 8px;
+            margin: 4rem 0;
+        }
+        
+        .cta-section h2 {
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .cta-section p {
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+            line-height: 1.6;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 2rem;
+            background-color: var(--bg-secondary);
+            color: var(--text-secondary);
+        }
+        
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin: 1.5rem 0;
+        }
+        
+        .footer-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .footer-links a:hover {
+            color: var(--accent);
+        }
+        
+        /* Media Queries */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .feature-cards, .steps {
+                grid-template-columns: 1fr;
+            }
+            
+            .cta-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .cta-btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">Diabetes<span>GPT</span></div>
+        <div class="subtitle">Your AI-powered diabetes management assistant</div>
+        <nav>
+            <ul>
+                <li><a href="index.html" class="active">Home</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="chat.html">Chat</a></li>
+            </ul>
+        </nav>
+    </header>
+    
+    <main>
+        <section class="hero">
+            <h1>Manage Your Diabetes <span>Smarter</span> With AI</h1>
+            <p>
+                DiabetesGPT provides personalized guidance for glucose management, diet planning, and lifestyle adjustments to help you live better with diabetes. Get instant, AI-powered advice tailored to your specific needs.
+            </p>
+            <div class="cta-buttons">
+                <a href="chat.html" class="cta-btn primary-btn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                    </svg>
+                    Start Chatting
+                </a>
+                <a href="about.html" class="cta-btn secondary-btn">
+                    Learn More
+                </a>
+            </div>
+        </section>
+        
+        <section class="features">
+            <h2 class="section-title">What We Offer</h2>
+            <div class="feature-cards">
+                <div class="card">
+                    <div class="card-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M18 8h1a4 4 0 0 1 0 8h-1"></path>
+                            <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path>
+                            <line x1="6" y1="1" x2="6" y2="4"></line>
+                            <line x1="10" y1="1" x2="10" y2="4"></line>
+                            <line x1="14" y1="1" x2="14" y2="4"></line>
+                        </svg>
+                    </div>
+                    <h3 class="card-title">Glucose Management</h3>
+                    <p class="card-content">
+                        Get personalized advice on blood glucose monitoring, insulin management, and understanding your readings. Learn how to respond to highs and lows effectively.
+                    </p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 20.94c1.5 0 2.75 1.06 4 1.06 3 0 6-8 6-12.22A4.91 4.91 0 0 0 17 5c-2.22 0-4 1.44-5 2-1-.56-2.78-2-5-2a4.9 4.9 0 0 0-5 4.78C2 14 5 22 8 22c1.25 0 2.5-1.06 4-1.06z"></path>
+                            <path d="M12 7c1-.56 2.78-2 5-2a4.9 4.9 0 0 1 5 4.78c0 .12 0 .23-.02.36"></path>
+                        </svg>
+                    </div>
+                    <h3 class="card-title">Diet Planning</h3>
+                    <p class="card-content">
+                        Learn about carbohydrate counting, meal planning, and food choices that help maintain healthy blood sugar levels. Get recipe ideas and nutritional guidance.
+                    </p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <circle cx="12" cy="12" r="4"></circle>
+                            <line x1="4.93" y1="4.93" x2="9.17" y2="9.17"></line>
+                            <line x1="14.83" y1="14.83" x2="19.07" y2="19.07"></line>
+                            <line x1="14.83" y1="9.17" x2="19.07" y2="4.93"></line>
+                            <line x1="14.83" y1="9.17" x2="18.36" y2="5.64"></line>
+                            <line x1="4.93" y1="19.07" x2="9.17" y2="14.83"></line>
+                        </svg>
+                    </div>
+                    <h3 class="card-title">Physical Activity</h3>
+                    <p class="card-content">
+                        Discover how exercise affects your glucose levels and get recommendations for safe and effective physical activities tailored to your specific condition.
+                    </p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
+                        </svg>
+                    </div>
+                    <h3 class="card-title">Health Monitoring</h3>
+                    <p class="card-content">
+                        Get insights on tracking important health metrics, understanding lab results, and recognizing warning signs that need medical attention.
+                    </p>
+                </div>
+            </div>
+        </section>
+        
+        <section class="how-it-works">
+            <h2 class="section-title">How It Works</h2>
+            <div class="steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <h3 class="step-title">Start a Chat</h3>
+                    <p class="step-description">
+                        Open the chat interface and begin your conversation with our AI assistant - no account or login required.
+                    </p>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <h3 class="step-title">Ask Your Questions</h3>
+                    <p class="step-description">
+                        Inquire about any diabetes-related topic, from glucose management to diet recommendations and exercise.
+                    </p>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <h3 class="step-title">Get Personalized Advice</h3>
+                    <p class="step-description">
+                        Receive AI-generated guidance based on current medical knowledge and best practices for diabetes management.
+                    </p>
+                </div>
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <h3 class="step-title">Take Control</h3>
+                    <p class="step-description">
+                        Apply the insights to better manage your condition and improve your quality of life with diabetes.
+                    </p>
+                </div>
+            </div>
+        </section>
+        
+        <section class="testimonials">
+            <h2 class="section-title">What Our Users Say</h2>
+            <div class="testimonial-cards">
+                <div class="testimonial-card">
+                    <p class="quote">
+                        DiabetesGPT has transformed how I manage my Type 2 diabetes. The meal planning advice is practical and the glucose management tips have helped me maintain steadier levels.
+                    </p>
+                    <p class="author">Sarah K., Living with Type 2 Diabetes</p>
+                </div>
+                <div class="testimonial-card">
+                    <p class="quote">
+                        As a parent of a child with Type 1, this tool has been incredibly helpful for answering those middle-of-the-night questions when we're not sure what to do.
+                    </p>
+                    <p class="author">Mark T., Parent of T1D Child</p>
+                </div>
+                <div class="testimonial-card">
+                    <p class="quote">
+                        The exercise recommendations are tailored perfectly to how my body responds to activity. It's like having a diabetes educator in my pocket at all times.
+                    </p>
+                    <p class="author">Lisa M., Living with Type 1 Diabetes</p>
+                </div>
+            </div>
+        </section>
+        
+        <section class="cta-section">
+            <h2>Ready to Take Control of Your Diabetes?</h2>
+            <p>
+                Start chatting with DiabetesGPT today and discover how AI can help you manage your condition better, make informed decisions, and improve your quality of life.
+            </p>
+            <a href="chat.html" class="cta-btn primary-btn">
+                Start Using DiabetesGPT Now
+            </a>
+        </section>
+    </main>
+    
+    <footer>
+        <div class="footer-links">
+            <a href="index.html">Home</a>
+            <a href="about.html">About</a>
+            <a href="privacy.html">Privacy Policy</a>
+            <a href="terms.html">Terms of Use</a>
+            <a href="contact.html">Contact Us</a>
+        </div>
+        <p>DiabetesGPT 2025 | Built with custom LLM technology</p>
+        <p class="disclaimer">DiabetesGPT provides informational content only and is not a substitute for professional medical advice.</p>
+    </footer>
+</body>
+</html>
