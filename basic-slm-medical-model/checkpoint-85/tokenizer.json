@@ -1,6 +1,11 @@
 {
   "version": "1.0",
-  "truncation": null,
+  "truncation": {
+    "direction": "Right",
+    "max_length": 512,
+    "strategy": "LongestFirst",
+    "stride": 0
+  },
   "padding": null,
   "added_tokens": [
     {
