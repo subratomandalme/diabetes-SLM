@@ -9,15 +9,15 @@ from flask import Flask, request, jsonify, render_template
 
 app = Flask(__name__)
 
-# --- Global Variables ---
+
 MODEL_RUNNER_PATH = 'model_runner.py'
 APP_DIR = os.path.dirname(os.path.abspath(__file__)) if '__file__' in locals() else os.getcwd()
 STATIC_FOLDER = os.path.join(APP_DIR, "static")
 TEMPLATE_FOLDER = os.path.join(APP_DIR, "templates")
-# Define a cache directory within the universally writable /tmp directory
-HF_CACHE_DIR = "/tmp/hf_cache" # Changed from /app/hf_cache
+
+HF_CACHE_DIR = "/tmp/hf_cache" 
 os.makedirs(TEMPLATE_FOLDER, exist_ok=True)
-# Removed os.makedirs(HF_CACHE_DIR, exist_ok=True) as /tmp should exist and be writable
+
 
 input_queue = queue.Queue()
 output_queue = queue.Queue()
@@ -25,7 +25,7 @@ llm_process = None
 llm_ready = False
 llm_lock = threading.Lock()
 
-# --- Helper Function ---
+
 def pipe_reader(pipe, processing_queue, pipe_name):
     try:
         for line in iter(pipe.readline, ''):
@@ -41,7 +41,7 @@ def pipe_reader(pipe, processing_queue, pipe_name):
         except Exception: pass
         print(f"Pipe reader thread for {pipe_name} finished.", flush=True)
 
-# --- Main LLM Runner Function ---
+
 def run_llm():
     global llm_process, llm_ready
     with llm_lock:
@@ -82,7 +82,7 @@ def run_llm():
                   output_queue.put(f"Error: Invalid working directory '{working_dir}'")
                   return
 
-        # --- Prepare environment for subprocess ---
+        
         sub_env = os.environ.copy()
         sub_env['TRANSFORMERS_CACHE'] = HF_CACHE_DIR
         sub_env['HF_HOME'] = HF_CACHE_DIR
@@ -214,7 +214,7 @@ def run_llm():
 
         print("LLM run thread finished.", flush=True)
 
-# --- Flask Routes ---
+
 @app.route('/')
 def index():
     template_path = os.path.join(TEMPLATE_FOLDER, 'index.html')
@@ -320,14 +320,14 @@ def ask_llm():
     finally:
         print(f"--- Finished /ask request. Total time: {time.time() - request_start_time:.2f}s ---", flush=True)
 
-# --- Main Execution Block ---
+
 if __name__ == '__main__':
     print("Verifying paths...")
     print(f"  APP_DIR: {APP_DIR}")
     absolute_model_runner_path = os.path.abspath(MODEL_RUNNER_PATH)
     print(f"  Resolved MODEL_RUNNER_PATH: {absolute_model_runner_path}")
     print(f"  TEMPLATE_FOLDER: {TEMPLATE_FOLDER}")
-    print(f"  HF_CACHE_DIR: {HF_CACHE_DIR}") # Log the cache dir path
+    print(f"  HF_CACHE_DIR: {HF_CACHE_DIR}")
 
     if not os.path.exists(absolute_model_runner_path):
         print(f"ERROR: Cannot start Flask app. model_runner.py not found at resolved path: {absolute_model_runner_path}", flush=True)
